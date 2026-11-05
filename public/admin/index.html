@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NM Global Logistics — Admin Control Hub</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --navy: #060d17;
+      --navy-sidebar: #091322;
+      --navy-card: #0e1c31;
+      --navy-light: #152640;
+      --orange: #f26522;
+      --orange-hover: #ff7a00;
+      --cyan: #0ea5e9;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(242, 101, 34, 0.35);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --white: #ffffff;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--navy); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Login View */
+    #loginView {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-card {
+      background: var(--navy-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 44px 36px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    .brand-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .brand-header h1 {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+    }
+    .brand-header h1 span { color: var(--orange); }
+    .brand-header p {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--navy);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-main);
+      font-size: 13.5px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 10px rgba(242, 101, 34, 0.2);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 20px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--orange);
+      color: var(--white);
+    }
+    .btn-primary:hover { background: var(--orange-hover); box-shadow: 0 4px 15px rgba(242, 101, 34, 0.4); }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+    }
+    .btn-outline:hover { background: var(--navy-light); border-color: rgba(255,255,255,0.2); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    /* Dashboard Layout */
+    #dashboardView {
+      display: none;
+      min-height: 100vh;
+      flex-direction: row;
+    }
+    .sidebar {
+      width: 270px;
+      background: var(--navy-sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .sidebar-header {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sidebar-header h2 {
+      font-size: 16px;
+      font-weight: 900;
+    }
+    .sidebar-header h2 span { color: var(--orange); }
+    .nav-menu {
+      list-style: none;
+      padding: 16px 12px;
+      flex: 1;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 13.5px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      transition: all 0.2s;
+    }
+    .nav-item:hover, .nav-item.active {
+      background: var(--navy-light);
+      color: var(--white);
+    }
+    .nav-item.active {
+      color: var(--orange);
+      background: rgba(242, 101, 34, 0.1);
+      border: 1px solid var(--border-accent);
+    }
+    .nav-item i { width: 18px; text-align: center; }
+
+    .user-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 36px 40px;
+      overflow-y: auto;
+      height: 100vh;
+    }
+    .content-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .content-header h1 {
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--navy-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .stat-val { font-size: 26px; font-weight: 800; margin-top: 4px; }
+    .stat-lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+    .stat-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .icon-new { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+    .icon-progress { background: rgba(245, 158, 11, 0.15); color: var(--yellow); }
+    .icon-quoted { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+    .icon-total { background: rgba(242, 101, 34, 0.15); color: var(--orange); }
+
+    /* Tables & Cards Grid */
+    .table-container {
+      background: var(--navy-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .table-toolbar {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--navy);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 14px;
+      width: 280px;
+    }
+    .search-box input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-size: 13px;
+      width: 100%;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      text-align: left;
+      padding: 12px 18px;
+      background: rgba(0,0,0,0.25);
+      color: var(--text-dim);
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tr:hover td {
+      background: rgba(255,255,255,0.02);
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .status-new { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .status-in_progress { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .status-quoted { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .status-closed { background: rgba(156, 163, 175, 0.2); color: #9ca3af; }
+    .status-cancelled { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+    /* Cards Admin Management Grid */
+    .admin-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .admin-card-item {
+      background: var(--navy-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.2s;
+    }
+    .admin-card-item.inactive {
+      opacity: 0.6;
+      border-style: dashed;
+    }
+    .admin-card-item:hover { border-color: var(--border-accent); }
+
+    /* Section Visibility Switch Box */
+    .sections-control-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 18px;
+    }
+    .section-switch-card {
+      background: var(--navy-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .section-switch-card.disabled {
+      opacity: 0.65;
+    }
+    .switch-info h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .switch-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* Custom Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #233549;
+      transition: .3s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--orange); }
+    input:checked + .slider:before { transform: translateX(22px); }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: var(--navy-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 650px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+    }
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .modal-footer {
+      padding: 18px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* ── CUSTOM CRANE ICON SUPPORT (FONT AWESOME COMPATIBLE) ── */
+    .fa-crane, .fa-solid.fa-crane {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      line-height: 1;
+      vertical-align: -0.125em;
+      background-color: currentColor;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23000' d='M507.3 221.7l-144-144c-6.2-6.2-16.4-6.2-22.6 0l-16 16c-6.2 6.2-6.2 16.4 0 22.6L377.4 168H288v-40c0-13.3-10.7-24-24-24h-48c-13.3 0-24 10.7-24 24v40h-48c-26.5 0-48 21.5-48 48v40H32c-17.7 0-32 14.3-32 32v128c0 17.7 14.3 32 32 32h16c0 35.3 28.7 64 64 64s64-28.7 64-64h192c0 35.3 28.7 64 64 64s64-28.7 64-64h16c17.7 0 32-14.3 32-32v-64c0-70.7-57.3-128-128-128h-32v-24h121.4l-44.7 44.7c-6.2 6.2-6.2 16.4 0 22.6l16 16c6.2 6.2 16.4 6.2 22.6 0l144-144c6.3-6.2 6.3-16.4 0-22.6zM112 464c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm288 0c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32z'/%3E%3C/svg%3E") no-repeat center / contain;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23000' d='M507.3 221.7l-144-144c-6.2-6.2-16.4-6.2-22.6 0l-16 16c-6.2 6.2-6.2 16.4 0 22.6L377.4 168H288v-40c0-13.3-10.7-24-24-24h-48c-13.3 0-24 10.7-24 24v40h-48c-26.5 0-48 21.5-48 48v40H32c-17.7 0-32 14.3-32 32v128c0 17.7 14.3 32 32 32h16c0 35.3 28.7 64 64 64s64-28.7 64-64h192c0 35.3 28.7 64 64 64s64-28.7 64-64h16c17.7 0 32-14.3 32-32v-64c0-70.7-57.3-128-128-128h-32v-24h121.4l-44.7 44.7c-6.2 6.2-6.2 16.4 0 22.6l16 16c6.2 6.2 16.4 6.2 22.6 0l144-144c6.3-6.2 6.3-16.4 0-22.6zM112 464c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm288 0c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32z'/%3E%3C/svg%3E") no-repeat center / contain;
+    }
+
+    /* Theme Preset Buttons */
+    .theme-preset-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--navy);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .theme-preset-btn span {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .theme-preset-btn:hover {
+      border-color: var(--border-accent);
+      background: var(--navy-light);
+    }
+    .theme-preset-btn.selected {
+      border-color: var(--orange);
+      background: rgba(242,101,34,0.1);
+      color: var(--orange);
+    }
+
+    /* Theme Mode Cards */
+    .theme-mode-card {
+      background: var(--navy);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .theme-mode-card input[type="radio"] { display: none; }
+    .theme-mode-card:hover { border-color: rgba(255,255,255,0.2); }
+    .theme-mode-card:has(input:checked) {
+      border-color: var(--orange);
+      background: rgba(242,101,34,0.07);
+    }
+    .theme-mode-swatch {
+      height: 50px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+    }
+    .theme-mode-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .theme-mode-desc {
+      font-size: 11.5px;
+      color: var(--text-dim);
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── 1. LOGIN SCREEN ── -->
+  <div id="loginView">
+    <div class="login-card">
+      <div class="brand-header">
+        <h1>NM<span>↗</span> GLOBAL LOGISTICS</h1>
+        <p>Central Operations &amp; CMS Hub</p>
+      </div>
+      <form id="loginForm" autocomplete="off">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="loginUsername" required placeholder="Enter username" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" required placeholder="Enter password" autocomplete="off">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px;">
+          <span>Sign In to Hub</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <div id="loginError" style="color: var(--red); font-size: 13px; margin-top: 14px; text-align: center; display: none;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── 2. DASHBOARD VIEW ── -->
+  <div id="dashboardView">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>NM<span>↗</span> ADMIN</h2>
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item active" onclick="switchTab('quotes')">
+          <i class="fa-solid fa-inbox"></i>
+          <span>Quotations</span>
+        </li>
+        <li class="nav-item" onclick="switchTab('cards')">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>Service Cards</span>
+        </li>
+        <li class="nav-item" onclick="switchTab('sections')">
+          <i class="fa-solid fa-toggle-on"></i>
+          <span>Section Visibility</span>
+        </li>
+        <li class="nav-item" onclick="switchTab('content')">
+          <i class="fa-solid fa-pen-to-square"></i>
+          <span>Section Content</span>
+        </li>
+        <li class="nav-item" onclick="switchTab('settings')">
+          <i class="fa-solid fa-phone"></i>
+          <span>Contact &amp; Address</span>
+        </li>
+        <li class="nav-item" onclick="switchTab('theme')">
+          <i class="fa-solid fa-palette"></i>
+          <span>Theme &amp; Branding</span>
+        </li>
+        <li class="nav-item" onclick="window.open('/', '_blank')">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>View Public Site</span>
+        </li>
+      </ul>
+      <div class="user-footer">
+        <div style="font-size: 13px;">
+          <strong id="loggedUser">Admin</strong>
+          <span style="display: block; font-size: 11px; color: var(--text-dim);">Super Administrator</span>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="logout()" title="Logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+
+      <!-- TAB 1: QUOTATIONS LIST -->
+      <section id="tab-quotes">
+        <div class="content-header">
+          <div>
+            <h1>Quotation Requests</h1>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Live inquiries registered directly through the website</p>
+          </div>
+          <button class="btn btn-outline" onclick="exportCsv()">
+            <i class="fa-solid fa-file-csv"></i>
+            <span>Export CSV</span>
+          </button>
+        </div>
+
+        <!-- Metric Stat Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div>
+              <div class="stat-lbl">New Inquiries</div>
+              <div class="stat-val" id="statNew">0</div>
+            </div>
+            <div class="stat-icon icon-new"><i class="fa-solid fa-bolt"></i></div>
+          </div>
+          <div class="stat-card">
+            <div>
+              <div class="stat-lbl">Under Review</div>
+              <div class="stat-val" id="statReview">0</div>
+            </div>
+            <div class="stat-icon icon-progress"><i class="fa-solid fa-clock"></i></div>
+          </div>
+          <div class="stat-card">
+            <div>
+              <div class="stat-lbl">Quoted / Sent</div>
+              <div class="stat-val" id="statQuoted">0</div>
+            </div>
+            <div class="stat-icon icon-quoted"><i class="fa-solid fa-check"></i></div>
+          </div>
+          <div class="stat-card">
+            <div>
+              <div class="stat-lbl">Total Volume</div>
+              <div class="stat-val" id="statTotal">0</div>
+            </div>
+            <div class="stat-icon icon-total"><i class="fa-solid fa-boxes-stacked"></i></div>
+          </div>
+        </div>
+
+        <!-- Quotes Table -->
+        <div class="table-container">
+          <div class="table-toolbar">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass" style="color: var(--text-dim);"></i>
+              <input type="text" id="quoteSearchInput" placeholder="Search client, cargo, route..." oninput="debouncedFetchQuotes()">
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <select id="quoteStatusFilter" onchange="fetchQuotes()" style="background: var(--navy); color: var(--text-main); border: 1px solid var(--border); padding: 7px 12px; border-radius: 6px; font-size: 13px;">
+                <option value="">All Statuses</option>
+                <option value="new">New</option>
+                <option value="in_progress">In Progress</option>
+                <option value="quoted">Quoted</option>
+                <option value="closed">Closed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="fetchQuotes()"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Date</th>
+                <th>Client / Entity</th>
+                <th>Service</th>
+                <th>Route (Origin → Site)</th>
+                <th>Phone / Email</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="quotesTableBody">
+              <tr><td colspan="8" style="text-align:center; padding: 30px; color: var(--text-dim);">Loading inquiries...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 2: SERVICE CARDS MANAGEMENT (REQUESTED BY USER) -->
+      <section id="tab-cards" style="display: none;">
+        <div class="content-header">
+          <div>
+            <h1>Service Cards Control</h1>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Add, edit, reorder or toggle cards displayed on the public website</p>
+          </div>
+          <button class="btn btn-primary" onclick="openAddCardModal()">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add New Card</span>
+          </button>
+        </div>
+
+        <div class="admin-cards-grid" id="adminCardsContainer">
+          <!-- Loaded dynamically via /admin/api/cards -->
+        </div>
+      </section>
+
+      <!-- TAB 3: SECTION VISIBILITY TOGGLES (REQUESTED BY USER) -->
+      <section id="tab-sections" style="display: none;">
+        <div class="content-header">
+          <div>
+            <h1>Section Visibility Controls</h1>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Turn entire website sections On or Off with a single click</p>
+          </div>
+          <button class="btn btn-primary" onclick="saveSectionToggles()">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Save Visibility Settings</span>
+          </button>
+        </div>
+
+        <div class="sections-control-grid">
+          
+          <div class="section-switch-card">
+            <div class="switch-info">
+              <h4>Hero Section</h4>
+              <p>Top presentation banner with main headline and coordination HUD</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle_section_hero" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="section-switch-card">
+            <div class="switch-info">
+              <h4>Services Cards Section</h4>
+              <p>Dynamic service cards grid managed in the Service Cards tab</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle_section_services" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="section-switch-card">
+            <div class="switch-info">
+              <h4>4-Step Approach Section</h4>
+              <p>The "A clear plan. A shared understanding" execution flow</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle_section_approach" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="section-switch-card">
+            <div class="switch-info">
+              <h4>Industries Supported Section</h4>
+              <p>6-pillar industrial sector badges (Manufacturing, EPC, Steel, etc.)</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle_section_industries" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="section-switch-card">
+            <div class="switch-info">
+              <h4>Coverage &amp; Headquarters Section</h4>
+              <p>Pan-India coordination layout and registered office address</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle_section_coverage" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="section-switch-card">
+            <div class="switch-info">
+              <h4>Testimonials Section</h4>
+              <p>Client reviews, operational feedback, and trust quotes</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle_section_testimonials" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="section-switch-card">
+            <div class="switch-info">
+              <h4>Quotation Form Section</h4>
+              <p>Interactive web inquiry form for client transport/crane requests</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle_section_quote" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="section-switch-card">
+            <div class="switch-info">
+              <h4>Contact Channels Section</h4>
+              <p>Bottom contact tiles, general inquiry and quotations email links</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle_section_contact" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+        </div>
+
+        <!-- Individual Contact Cards Visibility -->
+        <h3 style="font-size: 16px; font-weight: 800; color: var(--orange); margin: 36px 0 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+          <i class="fa-solid fa-address-card"></i> Operations Desk Individual Cards ("Connect with our operations desk")
+        </h3>
+        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
+          Control precisely which contact channel cards appear inside the Operations Desk section
+        </p>
+
+        <div class="sections-control-grid">
+
+          <div class="section-switch-card">
+            <div class="switch-info">
+              <h4>📞 24/7 Operations Hotline Card</h4>
+              <p>Direct calling phone number &amp; click-to-call button</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle_contact_card_phone" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="section-switch-card">
+            <div class="switch-info">
+              <h4>📍 Office Coordinates Card</h4>
+              <p>Registered physical address &amp; Google Maps navigation button</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle_contact_card_address" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="section-switch-card">
+            <div class="switch-info">
+              <h4>💬 WhatsApp Freight Desk Card</h4>
+              <p>Direct WhatsApp chat link &amp; pre-filled dispatch query</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle_contact_card_whatsapp" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="section-switch-card">
+            <div class="switch-info">
+              <h4>📄 Quotations &amp; Tenders Card</h4>
+              <p>Quotations department email link &amp; RFQ quick button</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle_contact_card_quotes" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="section-switch-card">
+            <div class="switch-info">
+              <h4>✉️ General Inquiries Card</h4>
+              <p>Corporate communications &amp; general inquiry email link</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle_contact_card_general" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+        </div>
+
+        <div id="sectionSaveMsg" style="margin-top: 24px; font-size: 13.5px; font-weight: 700; color: var(--green); display: none;">
+          ✓ Section visibility preferences updated! Public page updated immediately.
+        </div>
+      </section>
+
+      <!-- TAB 4: CONTACT & WHATSAPP SETTINGS (EXPANDED WITH PHONE, ADDRESS) -->
+      <section id="tab-settings" style="display: none;">
+        <div class="content-header">
+          <div>
+            <h1>Contact, Phone &amp; Office Settings</h1>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">All contact info, calling numbers, address, and WhatsApp — displayed live on the public site</p>
+          </div>
+          <button class="btn btn-primary" onclick="saveContactSettings()">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Save Settings</span>
+          </button>
+        </div>
+
+        <div style="background: var(--navy-card); border: 1px solid var(--border); border-radius: 10px; padding: 32px; max-width: 820px;">
+          <form id="contactSettingsForm" onsubmit="event.preventDefault(); saveContactSettings();">
+
+            <h3 style="font-size: 15px; color: var(--cyan); margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+              <i class="fa-solid fa-heading"></i> Contact Section Header &amp; Heading
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 18px;">
+              <div class="form-group">
+                <label>Section Eyebrow</label>
+                <input type="text" id="set_contact_eyebrow" placeholder="DIRECT CONTACT & DISPATCH">
+              </div>
+              <div class="form-group">
+                <label>Section Main Heading Title</label>
+                <input type="text" id="set_contact_title" placeholder="Connect with our operations desk.">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 24px;">
+              <label>Section Subtitle / Description</label>
+              <textarea id="set_contact_subtitle" rows="2" placeholder="Reach our logistics coordinators for immediate fleet dispatch..."></textarea>
+            </div>
+
+            <h3 style="font-size: 15px; color: var(--orange); margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+              <i class="fa-solid fa-phone-volume"></i> Direct Calling &amp; Hotline
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+              <div class="form-group">
+                <label>Primary Phone Number (with country code, no spaces)</label>
+                <input type="text" id="set_phone_number" placeholder="+919443123456">
+                <small style="color: var(--text-dim); font-size: 11px; display: block; margin-top: 4px;">Used for tel: links — click-to-call. Include country code.</small>
+              </div>
+              <div class="form-group">
+                <label>Display Format (Formatted for public view)</label>
+                <input type="text" id="set_phone_display" placeholder="+91 94431 23456">
+                <small style="color: var(--text-dim); font-size: 11px; display: block; margin-top: 4px;">Shown in top bar, contact section, and footer.</small>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+              <div class="form-group">
+                <label>Secondary / Alternate Phone</label>
+                <input type="text" id="set_alternate_phone" placeholder="+91 98422 67890">
+              </div>
+              <div class="form-group">
+                <label>Business Hours Display</label>
+                <input type="text" id="set_business_hours" placeholder="Mon – Sat: 8:30 AM – 8:30 PM">
+              </div>
+            </div>
+
+            <h3 style="font-size: 15px; color: var(--cyan); margin-top: 32px; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+              <i class="fa-solid fa-location-dot"></i> Registered Office &amp; Location
+            </h3>
+            <div class="form-group">
+              <label>Registered Office Address (Full address as displayed on public site)</label>
+              <textarea id="set_office_address" rows="3" placeholder="3/19F, Maran Nagar, Kallimandayam, Dindigul district, Tamil Nadu – 624616, India"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Google Maps URL (for "Open in Maps" button)</label>
+              <input type="url" id="set_google_maps_url" placeholder="https://maps.google.com/?q=Kallimandayam+Dindigul+Tamil+Nadu">
+            </div>
+
+            <h3 style="font-size: 15px; color: var(--green); margin-top: 32px; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+              <i class="fa-brands fa-whatsapp"></i> WhatsApp Integration
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+              <div class="form-group">
+                <label>WhatsApp Number (Country code + digits, no + or spaces)</label>
+                <input type="text" id="set_whatsapp_number" placeholder="919876543210">
+                <small style="color: var(--text-dim); font-size: 11px; display: block; margin-top: 4px;">Feeds the floating button, top bar, and contact section.</small>
+              </div>
+              <div class="form-group">
+                <label>Pre-filled WhatsApp Chat Message</label>
+                <input type="text" id="set_whatsapp_message" placeholder="Hi NM Global Logistics, I need a quote...">
+              </div>
+            </div>
+
+            <h3 style="font-size: 15px; color: var(--yellow, #f59e0b); margin-top: 32px; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+              <i class="fa-solid fa-envelope"></i> Email Contacts &amp; Response SLA
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+              <div class="form-group">
+                <label>General Inquiries Email</label>
+                <input type="email" id="set_contact_email" placeholder="info@nmgloballogistics.in">
+              </div>
+              <div class="form-group">
+                <label>Quotations Department Email</label>
+                <input type="email" id="set_quotations_email" placeholder="quotations@nmgloballogistics.in">
+              </div>
+            </div>
+            <div class="form-group" style="max-width: 400px;">
+              <label>Response Time Guarantee Display</label>
+              <input type="text" id="set_response_time" placeholder="within one business day">
+              <small style="color: var(--text-dim); font-size: 11px; display: block; margin-top: 4px;">Shown in hero HUD and quotation form.</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 20px; min-width: 200px;">
+              <i class="fa-solid fa-check"></i> Save All Contact Parameters
+            </button>
+            <div id="contactSaveMsg" style="margin-top: 14px; font-size: 13px; font-weight: 700; color: var(--green); display: none;"></div>
+          </form>
+        </div>
+      </section>
+
+      <!-- TAB 5: SECTION CONTENT EDITOR -->
+      <section id="tab-content" style="display: none;">
+        <div class="content-header">
+          <div>
+            <h1>Section Content Editor</h1>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Edit Hero text, Approach steps, Coverage copy, Industries list, and Testimonials</p>
+          </div>
+          <button class="btn btn-primary" onclick="saveContentSettings()">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Save Content</span>
+          </button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 28px; max-width: 820px;">
+
+          <!-- Hero Content -->
+          <div style="background: var(--navy-card); border: 1px solid var(--border); border-radius: 10px; padding: 28px;">
+            <h3 style="font-size: 15px; color: var(--orange); margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+              <i class="fa-solid fa-star"></i> Hero Section Content
+            </h3>
+            <div class="form-group">
+              <label>Badge / Tagline Pill Text</label>
+              <input type="text" id="set_hero_badge" placeholder="NM GLOBAL · HEAVY TRANSPORT & CRANE INFRASTRUCTURE">
+            </div>
+            <div class="form-group">
+              <label>Main Heading Title</label>
+              <input type="text" id="set_hero_title" placeholder="Precision Heavy Logistics & Mobile Crane Solutions.">
+            </div>
+            <div class="form-group">
+              <label>Hero Description Paragraph</label>
+              <textarea id="set_hero_desc" rows="3" placeholder="Full truckload transport, specialized ODC cargo movements..."></textarea>
+            </div>
+          </div>
+
+          <!-- Approach Steps -->
+          <div style="background: var(--navy-card); border: 1px solid var(--border); border-radius: 10px; padding: 28px;">
+            <h3 style="font-size: 15px; color: var(--cyan); margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+              <i class="fa-solid fa-list-ol"></i> Approach (4-Step) Section
+            </h3>
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              <div id="approachStepsEditor"></div>
+            </div>
+          </div>
+
+          <!-- Coverage Section -->
+          <div style="background: var(--navy-card); border: 1px solid var(--border); border-radius: 10px; padding: 28px;">
+            <h3 style="font-size: 15px; color: var(--text-muted); margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+              <i class="fa-solid fa-map"></i> Coverage &amp; Headquarters Section
+            </h3>
+            <div class="form-group">
+              <label>Section Title</label>
+              <input type="text" id="set_coverage_title" placeholder="Headquartered in Tamil Nadu. Coordinating Nationwide.">
+            </div>
+            <div class="form-group">
+              <label>Section Description</label>
+              <textarea id="set_coverage_desc" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Network Coverage Text (shown in radar card)</label>
+              <textarea id="set_coverage_network_text" rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- Contact Section Header & Copy -->
+          <div style="background: var(--navy-card); border: 1px solid var(--border); border-radius: 10px; padding: 28px;">
+            <h3 style="font-size: 15px; color: var(--cyan); margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+              <i class="fa-solid fa-phone-volume"></i> Contact Section Header &amp; Subtitle
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 14px;">
+              <div class="form-group">
+                <label>Section Eyebrow</label>
+                <input type="text" id="set_content_contact_eyebrow" placeholder="DIRECT CONTACT & DISPATCH">
+              </div>
+              <div class="form-group">
+                <label>Main Heading Title</label>
+                <input type="text" id="set_content_contact_title" placeholder="Connect with our operations desk.">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Section Subtitle / Description</label>
+              <textarea id="set_content_contact_subtitle" rows="2" placeholder="Reach our logistics coordinators for immediate fleet dispatch..."></textarea>
+            </div>
+          </div>
+
+          <!-- Industries JSON Editor -->
+          <div style="background: var(--navy-card); border: 1px solid var(--border); border-radius: 10px; padding: 28px;">
+            <h3 style="font-size: 15px; color: var(--green); margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+              <i class="fa-solid fa-industry"></i> Industries Section (JSON List)
+            </h3>
+            <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 14px;">JSON array of objects: <code style="background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:4px;">[ {"icon":"fa-industry","name":"Sector Name","desc":"Description"} ]</code></p>
+            <div class="form-group">
+              <label>Industries JSON</label>
+              <textarea id="set_industries_json" rows="10" style="font-family: monospace; font-size: 12px;"></textarea>
+            </div>
+          </div>
+
+          <!-- Testimonials JSON Editor -->
+          <div style="background: var(--navy-card); border: 1px solid var(--border); border-radius: 10px; padding: 28px;">
+            <h3 style="font-size: 15px; color: var(--orange); margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+              <i class="fa-solid fa-quote-left"></i> Testimonials Section (JSON List)
+            </h3>
+            <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 14px;">JSON array of objects: <code style="background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:4px;">[ {"stars":5,"quote":"...","name":"...","company":"..."} ]</code></p>
+            <div class="form-group">
+              <label>Testimonials JSON</label>
+              <textarea id="set_testimonials_json" rows="12" style="font-family: monospace; font-size: 12px;"></textarea>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="saveContentSettings()" style="align-self: flex-start; min-width: 220px;">
+            <i class="fa-solid fa-check"></i> Save All Content
+          </button>
+          <div id="contentSaveMsg" style="font-size: 13px; font-weight: 700; color: var(--green); display: none;"></div>
+        </div>
+      </section>
+
+      <!-- TAB 6: THEME & BRANDING -->
+      <section id="tab-theme" style="display: none;">
+        <div class="content-header">
+          <div>
+            <h1>Theme &amp; Branding</h1>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Control the accent color, background preset, and visual personality of the public website</p>
+          </div>
+          <button class="btn btn-primary" onclick="saveThemeSettings()">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Apply Theme</span>
+          </button>
+        </div>
+
+        <div style="background: var(--navy-card); border: 1px solid var(--border); border-radius: 10px; padding: 32px; max-width: 780px;">
+          
+          <!-- Brand Logo Configuration -->
+          <h3 style="font-size: 15px; color: var(--orange); margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+            <i class="fa-solid fa-shapes"></i> Brand Logo &amp; Identity
+          </h3>
+
+          <div style="background: var(--navy); border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-bottom: 24px;">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px;">Live Logo Preview</div>
+            <div id="adminLogoPreview" style="display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; color: var(--white); background: rgba(0,0,0,0.4); padding: 10px 18px; border-radius: 6px; border: 1px solid var(--border);">
+              <span id="previewLogoMark" style="color: var(--orange); font-size: 18px;"><i id="previewLogoIcon" class="fa-solid fa-diamond"></i></span>
+              <span id="previewLogoText">NM GLOBAL LOGISTICS</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Logo Text (Brand Display Name)</label>
+            <input type="text" id="set_logo_text" placeholder="NM GLOBAL LOGISTICS" oninput="updateAdminLogoPreview()">
+          </div>
+
+          <div class="form-group">
+            <label>Logo Icon (FontAwesome icon class for icon-mode logo)</label>
+            <input type="text" id="set_logo_icon" placeholder="fa-diamond" oninput="updateAdminLogoPreview()">
+            <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="selectLogoIcon('fa-diamond')"><i class="fa-solid fa-diamond"></i> Diamond</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="selectLogoIcon('fa-truck-fast')"><i class="fa-solid fa-truck-fast"></i> Truck</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="selectLogoIcon('fa-trailer')"><i class="fa-solid fa-trailer"></i> Trailer</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="selectLogoIcon('fa-anchor')"><i class="fa-solid fa-anchor"></i> Maritime</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="selectLogoIcon('fa-shield-halved')"><i class="fa-solid fa-shield-halved"></i> Shield</button>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 32px;">
+            <label>Custom Logo Image URL (Optional - SVG, PNG, WebP)</label>
+            <input type="url" id="set_logo_image_url" placeholder="https://example.com/logo.png (leave empty for dynamic icon + text)" oninput="updateAdminLogoPreview()">
+            <small style="color: var(--text-dim); font-size: 11px; display: block; margin-top: 4px;">If provided, image will render as the logo across public header and footer.</small>
+          </div>
+
+          <!-- Accent Color Palette Presets -->
+          <h3 style="font-size: 15px; color: var(--cyan); margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+            <i class="fa-solid fa-palette"></i> Accent Color Presets
+          </h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px;">
+            <button class="theme-preset-btn" data-color="#f26522" onclick="setAccentPreset('#f26522', this)">
+              <span style="background: #f26522;"></span> Industrial Orange
+            </button>
+            <button class="theme-preset-btn" data-color="#ff7a00" onclick="setAccentPreset('#ff7a00', this)">
+              <span style="background: #ff7a00;"></span> Highway Amber
+            </button>
+            <button class="theme-preset-btn" data-color="#0ea5e9" onclick="setAccentPreset('#0ea5e9', this)">
+              <span style="background: #0ea5e9;"></span> Logistics Cyan
+            </button>
+            <button class="theme-preset-btn" data-color="#10b981" onclick="setAccentPreset('#10b981', this)">
+              <span style="background: #10b981;"></span> Emerald Cargo
+            </button>
+            <button class="theme-preset-btn" data-color="#eab308" onclick="setAccentPreset('#eab308', this)">
+              <span style="background: #eab308;"></span> Safety Yellow
+            </button>
+            <button class="theme-preset-btn" data-color="#e11d48" onclick="setAccentPreset('#e11d48', this)">
+              <span style="background: #e11d48;"></span> Heavy Crimson
+            </button>
+            <button class="theme-preset-btn" data-color="#8b5cf6" onclick="setAccentPreset('#8b5cf6', this)">
+              <span style="background: #8b5cf6;"></span> Tech Violet
+            </button>
+            <button class="theme-preset-btn" data-color="#06b6d4" onclick="setAccentPreset('#06b6d4', this)">
+              <span style="background: #06b6d4;"></span> Sky Route
+            </button>
+          </div>
+
+          <div class="form-group" style="max-width: 320px; margin-bottom: 32px;">
+            <label>Custom Accent Color (Hex)</label>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <input type="color" id="set_theme_color_picker" value="#f26522"
+                oninput="document.getElementById('set_theme_color').value = this.value"
+                style="width: 50px; height: 40px; padding: 2px; border-radius: 6px; cursor: pointer; background: none; border: 1px solid var(--border);">
+              <input type="text" id="set_theme_color" placeholder="#f26522" maxlength="7"
+                oninput="document.getElementById('set_theme_color_picker').value = this.value.length === 7 ? this.value : '#f26522'">
+            </div>
+          </div>
+
+          <!-- Background / Mode Preset -->
+          <h3 style="font-size: 15px; color: var(--cyan); margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+            Background Theme Mode
+          </h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-bottom: 28px;">
+            <label class="theme-mode-card" id="mode-midnight_asphalt">
+              <input type="radio" name="theme_preset" value="midnight_asphalt" checked>
+              <div class="theme-mode-swatch" style="background: linear-gradient(135deg, #060d17, #0a1526);"></div>
+              <div class="theme-mode-name">Midnight Asphalt</div>
+              <div class="theme-mode-desc">Deep, professional dark transport theme</div>
+            </label>
+            <label class="theme-mode-card" id="mode-industrial_slate">
+              <input type="radio" name="theme_preset" value="industrial_slate">
+              <div class="theme-mode-swatch" style="background: linear-gradient(135deg, #0d1117, #161b22);"></div>
+              <div class="theme-mode-name">Industrial Slate</div>
+              <div class="theme-mode-desc">GitHub dark-inspired neutral palette</div>
+            </label>
+            <label class="theme-mode-card" id="mode-high_contrast">
+              <input type="radio" name="theme_preset" value="high_contrast">
+              <div class="theme-mode-swatch" style="background: linear-gradient(135deg, #000000, #111111);"></div>
+              <div class="theme-mode-name">High Contrast</div>
+              <div class="theme-mode-desc">Maximum accessibility contrast mode</div>
+            </label>
+            <label class="theme-mode-card" id="mode-light">
+              <input type="radio" name="theme_preset" value="light">
+              <div class="theme-mode-swatch" style="background: linear-gradient(135deg, #f8fafc, #ffffff); border: 1px solid #e2e8f0;"></div>
+              <div class="theme-mode-name">Light Mode</div>
+              <div class="theme-mode-desc">Clean white business theme</div>
+            </label>
+          </div>
+
+          <button class="btn btn-primary" onclick="saveThemeSettings()" style="min-width: 220px;">
+            <i class="fa-solid fa-palette"></i> Apply Theme to Public Site
+          </button>
+          <div id="themeSaveMsg" style="margin-top: 14px; font-size: 13px; font-weight: 700; color: var(--green); display: none;"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ── 3. MODALS ── -->
+
+  <!-- A. QUOTE DETAIL MODAL -->
+  <div class="modal-overlay" id="quoteModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h3 id="modalRef" style="font-size: 16px; font-weight: 900; color: var(--orange);">NM-XXXX</h3>
+          <span id="modalDate" style="font-size: 11.5px; color: var(--text-dim);">Received: 2026-11-05</span>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="closeQuoteModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px;">
+          <div style="background: var(--navy); padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
+            <div style="font-size: 10.5px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Client Name</div>
+            <div style="font-size: 13.5px; font-weight: 600;" id="modalName">-</div>
+          </div>
+          <div style="background: var(--navy); padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
+            <div style="font-size: 10.5px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Company</div>
+            <div style="font-size: 13.5px; font-weight: 600;" id="modalCompany">-</div>
+          </div>
+          <div style="background: var(--navy); padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
+            <div style="font-size: 10.5px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Phone &amp; WhatsApp</div>
+            <div style="font-size: 13.5px; font-weight: 600;" id="modalPhone">-</div>
+          </div>
+          <div style="background: var(--navy); padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
+            <div style="font-size: 10.5px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Email Address</div>
+            <div style="font-size: 13.5px; font-weight: 600;" id="modalEmail">-</div>
+          </div>
+          <div style="background: var(--navy); padding: 12px; border-radius: 6px; border: 1px solid var(--border); grid-column: span 2;">
+            <div style="font-size: 10.5px; text-transform: uppercase; color: var(--orange); font-weight: 700;">Requested Service Type</div>
+            <div style="font-size: 14px; font-weight: 700;" id="modalService">-</div>
+          </div>
+          <div style="background: var(--navy); padding: 12px; border-radius: 6px; border: 1px solid var(--border); grid-column: span 2;">
+            <div style="font-size: 10.5px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Origin Pickup Location</div>
+            <div style="font-size: 13.5px;" id="modalPickup">-</div>
+          </div>
+          <div style="background: var(--navy); padding: 12px; border-radius: 6px; border: 1px solid var(--border); grid-column: span 2;">
+            <div style="font-size: 10.5px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Destination Delivery Site</div>
+            <div style="font-size: 13.5px;" id="modalDelivery">-</div>
+          </div>
+          <div style="background: var(--navy); padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
+            <div style="font-size: 10.5px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Cargo &amp; Weight</div>
+            <div style="font-size: 13px;" id="modalCargoWeight">-</div>
+          </div>
+          <div style="background: var(--navy); padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
+            <div style="font-size: 10.5px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Dimensions &amp; Schedule</div>
+            <div style="font-size: 13px;" id="modalDimDate">-</div>
+          </div>
+          <div style="background: var(--navy); padding: 12px; border-radius: 6px; border: 1px solid var(--border); grid-column: span 2;">
+            <div style="font-size: 10.5px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Site / Access Restrictions</div>
+            <div style="font-size: 13px; font-style: italic; color: var(--text-muted);" id="modalNotes">-</div>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border); padding-top: 16px;">
+          <div class="form-group">
+            <label>Update Status</label>
+            <select id="modalStatusSelect">
+              <option value="new">New</option>
+              <option value="in_progress">In Progress</option>
+              <option value="quoted">Quoted to Client</option>
+              <option value="closed">Closed / Dispatched</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Internal Dispatcher Notes</label>
+            <textarea id="modalAdminNotes" rows="2" placeholder="Record vendor quotes, trailer assignment details..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a id="modalWaBtn" href="#" target="_blank" class="btn btn-outline" style="color: #25d366; border-color: rgba(37, 211, 102, 0.4);">
+          <i class="fa-brands fa-whatsapp"></i> Chat Client
+        </a>
+        <button class="btn btn-primary" onclick="saveQuoteChanges()">
+          <i class="fa-solid fa-save"></i> Save Status
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- B. SERVICE CARD EDIT / CREATE MODAL -->
+  <div class="modal-overlay" id="cardModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="cardModalTitle" style="font-size: 16px; font-weight: 800;">Edit Service Card</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeCardModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="cardForm" onsubmit="event.preventDefault(); submitCardForm();">
+          <input type="hidden" id="card_id">
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label>Card Badge / Index (e.g. 01 / TRANSPORT)</label>
+              <input type="text" id="card_badge" placeholder="01 / TRANSPORT" required>
+            </div>
+            <div class="form-group">
+              <label>Service Category</label>
+              <input type="text" id="card_category" placeholder="Full &amp; Part Truck Load" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Service Title</label>
+            <input type="text" id="card_title" placeholder="Domestic Transportation" required>
+          </div>
+
+          <div class="form-group">
+            <label>Service Description</label>
+            <textarea id="card_description" rows="2" placeholder="Brief 1-2 sentence overview" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Feature Points (One per line)</label>
+            <textarea id="card_features" rows="3" placeholder="Full Truck Load (FTL)&#10;Factory-to-warehouse dispatch&#10;Route feasibility clearance"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Image URL (Unsplash or direct image link)</label>
+            <input type="url" id="card_image_url" placeholder="https://images.unsplash.com/photo-...">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label>Button Action Text</label>
+              <input type="text" id="card_action_text" value="Request Quote ↗">
+            </div>
+            <div class="form-group">
+              <label>Button Target Link</label>
+              <input type="text" id="card_action_link" value="#quote">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label>Display Sort Order (1, 2, 3...)</label>
+              <input type="number" id="card_sort_order" value="1">
+            </div>
+            <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 24px;">
+              <input type="checkbox" id="card_is_active" style="width: 20px; height: 20px; accent-color: var(--orange);" checked>
+              <label for="card_is_active" style="margin: 0; cursor: pointer;">Card Visible on Public Page</label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeCardModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitCardForm()">
+          <i class="fa-solid fa-check"></i> Save Card
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. SCRIPT LOGIC ── -->
+  <script>
+    let currentToken = localStorage.getItem('nm_admin_token');
+    let currentQuoteId = null;
+    let quotesCache = [];
+    let cardsCache = [];
+    let debounceTimer = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (currentToken) showDashboard();
+      else showLogin();
+    });
+
+    function showLogin() {
+      const uInput = document.getElementById('loginUsername');
+      const pInput = document.getElementById('loginPassword');
+      if (uInput) uInput.value = '';
+      if (pInput) pInput.value = '';
+      document.getElementById('loginView').style.display = 'flex';
+      document.getElementById('dashboardView').style.display = 'none';
+    }
+
+    function showDashboard() {
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'flex';
+      document.getElementById('loggedUser').innerText = localStorage.getItem('nm_admin_user') || 'Admin';
+      fetchStats();
+      fetchQuotes();
+      loadSectionToggles();
+      loadContactSettings();
+      fetchCards();
+    }
+
+    // ── AUTHENTICATION ──────────────────────────────────────────────
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const u = document.getElementById('loginUsername').value.trim();
+      const p = document.getElementById('loginPassword').value.trim();
+      const errEl = document.getElementById('loginError');
+      errEl.style.display = 'none';
+
+      try {
+        const res = await fetch('/admin/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: u, password: p })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || 'Authentication failed');
+
+        currentToken = data.token;
+        localStorage.setItem('nm_admin_token', currentToken);
+        localStorage.setItem('nm_admin_user', data.username);
+        showDashboard();
+      } catch (err) {
+        errEl.innerText = err.message;
+        errEl.style.display = 'block';
+      }
+    });
+
+    function logout() {
+      localStorage.removeItem('nm_admin_token');
+      localStorage.removeItem('nm_admin_user');
+      currentToken = null;
+      showLogin();
+    }
+
+    // ── NAVIGATION TABS ─────────────────────────────────────────────
+    function switchTab(tab) {
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const tabs = ['quotes', 'cards', 'sections', 'content', 'settings', 'theme'];
+      tabs.forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        if (el) el.style.display = (t === tab) ? 'block' : 'none';
+      });
+
+      const navIndexes = { quotes: 0, cards: 1, sections: 2, content: 3, settings: 4, theme: 5 };
+      document.querySelectorAll('.nav-menu .nav-item')[navIndexes[tab]]?.classList.add('active');
+
+      if (tab === 'quotes')   fetchQuotes();
+      if (tab === 'cards')    fetchCards();
+      if (tab === 'sections') loadSectionToggles();
+      if (tab === 'content')  loadContentSettings();
+      if (tab === 'settings') loadContactSettings();
+      if (tab === 'theme')    loadThemeSettings();
+    }
+
+    // ── TAB 1: QUOTES MANAGEMENT ────────────────────────────────────
+    async function fetchStats() {
+      try {
+        const res = await fetch('/admin/api/stats', { headers: { 'Authorization': `Bearer ${currentToken}` } });
+        if (res.status === 401) return logout();
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById('statNew').innerText = data.stats.new || 0;
+          document.getElementById('statReview').innerText = data.stats.in_progress || 0;
+          document.getElementById('statQuoted').innerText = data.stats.quoted || 0;
+          document.getElementById('statTotal').innerText = data.stats.total || 0;
+        }
+      } catch (e) {}
+    }
+
+    function debouncedFetchQuotes() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(fetchQuotes, 300);
+    }
+
+    async function fetchQuotes() {
+      const status = document.getElementById('quoteStatusFilter').value;
+      const search = document.getElementById('quoteSearchInput').value;
+      const tbody = document.getElementById('quotesTableBody');
+
+      let url = `/admin/api/quotes?`;
+      if (status) url += `status=${encodeURIComponent(status)}&`;
+      if (search) url += `search=${encodeURIComponent(search)}&`;
+
+      try {
+        const res = await fetch(url, { headers: { 'Authorization': `Bearer ${currentToken}` } });
+        if (res.status === 401) return logout();
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+
+        quotesCache = data.quotes;
+        renderQuotesTable(data.quotes);
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--red); padding: 20px;">${err.message}</td></tr>`;
+      }
+    }
+
+    function renderQuotesTable(quotes) {
+      const tbody = document.getElementById('quotesTableBody');
+      if (!quotes.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 40px; color: var(--text-dim);"><i class="fa-solid fa-inbox" style="font-size: 24px; margin-bottom: 8px; display:block;"></i>No quotation inquiries found</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = quotes.map(q => {
+        const dateStr = q.created_at ? q.created_at.split(' ')[0] : '-';
+        return `
+          <tr>
+            <td><strong style="color: var(--orange);">${q.ref_num}</strong></td>
+            <td style="color: var(--text-dim); font-size: 12px;">${dateStr}</td>
+            <td>
+              <strong>${q.name}</strong>
+              <div style="font-size: 11px; color: var(--text-dim);">${q.company || 'Direct Client'}</div>
+            </td>
+            <td><span style="font-weight: 700; color: var(--text-main);">${q.service_type}</span></td>
+            <td>
+              <div style="font-size: 12px;"><strong>From:</strong> ${q.pickup}</div>
+              <div style="font-size: 12px; color: var(--text-dim);"><strong>To:</strong> ${q.delivery}</div>
+            </td>
+            <td>
+              <div><a href="tel:${q.phone}" style="color:var(--text-main); text-decoration:none;">${q.phone}</a></div>
+              <div style="font-size: 11px; color: var(--text-dim);">${q.email}</div>
+            </td>
+            <td><span class="status-badge status-${q.status}">${q.status.replace('_', ' ')}</span></td>
+            <td>
+              <button class="btn btn-outline btn-sm" onclick="openQuoteModal(${q.id})">
+                <i class="fa-regular fa-eye"></i> View
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openQuoteModal(quoteId) {
+      const q = quotesCache.find(x => x.id === quoteId);
+      if (!q) return;
+
+      currentQuoteId = quoteId;
+      document.getElementById('modalRef').innerText = q.ref_num;
+      document.getElementById('modalDate').innerText = 'Received: ' + q.created_at;
+      document.getElementById('modalName').innerText = q.name;
+      document.getElementById('modalCompany').innerText = q.company || 'Not Specified';
+      document.getElementById('modalPhone').innerHTML = `${q.phone} ${q.whatsapp ? '<span style="color:#25d366; font-size:11px; font-weight:700;">(WhatsApp)</span>' : ''}`;
+      document.getElementById('modalEmail').innerText = q.email;
+      document.getElementById('modalService').innerText = q.service_type;
+      document.getElementById('modalPickup').innerText = q.pickup;
+      document.getElementById('modalDelivery').innerText = q.delivery;
+      document.getElementById('modalCargoWeight').innerText = `${q.cargo || 'General Cargo'} | ${q.weight || 'Tonnage not specified'}`;
+      document.getElementById('modalDimDate').innerText = `Dims: ${q.dimensions || 'Standard'} | Date: ${q.preferred_date || 'ASAP'}`;
+      document.getElementById('modalNotes').innerText = q.notes || 'No route/crane notes submitted.';
+      document.getElementById('modalStatusSelect').value = q.status;
+      document.getElementById('modalAdminNotes').value = q.admin_notes || '';
+
+      const cleanPhone = q.phone.replace(/[^0-9]/g, '');
+      const waMsg = encodeURIComponent(`Hi ${q.name}, following up regarding your NM Global Logistics quotation request (${q.ref_num}).`);
+      document.getElementById('modalWaBtn').href = `https://wa.me/${cleanPhone}?text=${waMsg}`;
+
+      document.getElementById('quoteModal').style.display = 'flex';
+    }
+
+    function closeQuoteModal() {
+      document.getElementById('quoteModal').style.display = 'none';
+      currentQuoteId = null;
+    }
+
+    async function saveQuoteChanges() {
+      if (!currentQuoteId) return;
+      const status = document.getElementById('modalStatusSelect').value;
+      const admin_notes = document.getElementById('modalAdminNotes').value;
+
+      try {
+        const res = await fetch(`/admin/api/quotes/${currentQuoteId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentToken}` },
+          body: JSON.stringify({ status, admin_notes })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+
+        closeQuoteModal();
+        fetchQuotes();
+        fetchStats();
+      } catch (err) {
+        alert('Failed: ' + err.message);
+      }
+    }
+
+    function exportCsv() {
+      window.open(`/admin/api/export/csv?token=${currentToken}`, '_blank');
+    }
+
+    // ── TAB 2: SERVICE CARDS MANAGEMENT (CRUD) ──────────────────────
+    async function fetchCards() {
+      try {
+        const res = await fetch('/admin/api/cards', { headers: { 'Authorization': `Bearer ${currentToken}` } });
+        if (res.status === 401) return logout();
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+
+        cardsCache = data.cards;
+        renderAdminCards(data.cards);
+      } catch (err) {
+        document.getElementById('adminCardsContainer').innerHTML = `<p style="color:var(--red);">${err.message}</p>`;
+      }
+    }
+
+    function renderAdminCards(cards) {
+      const container = document.getElementById('adminCardsContainer');
+      if (!cards.length) {
+        container.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1;">No cards found. Click "Add New Card" above.</p>`;
+        return;
+      }
+
+      container.innerHTML = cards.map(c => `
+        <div class="admin-card-item ${c.is_active ? '' : 'inactive'}">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:11px; font-weight:800; color:var(--orange);">${c.badge || 'CARD'}</span>
+              <span style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px; ${c.is_active ? 'background:rgba(16,185,129,0.2); color:#34d399;' : 'background:rgba(239,68,68,0.2); color:#f87171;'}">
+                ${c.is_active ? '● VISIBLE' : '○ HIDDEN'}
+              </span>
+            </div>
+            <h3 style="font-size:17px; font-weight:800; color:var(--white); margin-bottom:4px;">${c.title}</h3>
+            <div style="font-size:12px; color:var(--cyan); font-weight:600; margin-bottom:10px;">${c.category}</div>
+            <p style="font-size:12.5px; color:var(--text-muted); line-height:1.5; margin-bottom:14px;">${c.description}</p>
+          </div>
+
+          <div style="display:flex; gap:8px; border-top:1px solid var(--border); padding-top:14px; margin-top:10px;">
+            <button class="btn btn-outline btn-sm" style="flex:1;" onclick="openEditCardModal(${c.id})">
+              <i class="fa-solid fa-pen"></i> Edit
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="toggleCardVisibility(${c.id})" title="${c.is_active ? 'Hide Card' : 'Show Card'}">
+              <i class="fa-solid ${c.is_active ? 'fa-eye-slash' : 'fa-eye'}"></i>
+            </button>
+            <button class="btn btn-outline btn-sm" style="color:var(--red);" onclick="deleteCard(${c.id})" title="Delete Card">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openAddCardModal() {
+      document.getElementById('cardModalTitle').innerText = 'Add New Service Card';
+      document.getElementById('card_id').value = '';
+      document.getElementById('cardForm').reset();
+      document.getElementById('card_is_active').checked = true;
+      document.getElementById('cardModal').style.display = 'flex';
+    }
+
+    function openEditCardModal(cardId) {
+      const c = cardsCache.find(x => x.id === cardId);
+      if (!c) return;
+
+      document.getElementById('cardModalTitle').innerText = 'Edit Service Card';
+      document.getElementById('card_id').value = c.id;
+      document.getElementById('card_badge').value = c.badge || '';
+      document.getElementById('card_category').value = c.category || '';
+      document.getElementById('card_title').value = c.title || '';
+      document.getElementById('card_description').value = c.description || '';
+      document.getElementById('card_features').value = c.features || '';
+      document.getElementById('card_image_url').value = c.image_url || '';
+      document.getElementById('card_action_text').value = c.action_text || 'Request Quote ↗';
+      document.getElementById('card_action_link').value = c.action_link || '#quote';
+      document.getElementById('card_sort_order').value = c.sort_order || 1;
+      document.getElementById('card_is_active').checked = !!c.is_active;
+
+      document.getElementById('cardModal').style.display = 'flex';
+    }
+
+    function closeCardModal() {
+      document.getElementById('cardModal').style.display = 'none';
+    }
+
+    async function submitCardForm() {
+      const cardId = document.getElementById('card_id').value;
+      const payload = {
+        badge: document.getElementById('card_badge').value.trim(),
+        category: document.getElementById('card_category').value.trim(),
+        title: document.getElementById('card_title').value.trim(),
+        description: document.getElementById('card_description').value.trim(),
+        features: document.getElementById('card_features').value.trim(),
+        image_url: document.getElementById('card_image_url').value.trim(),
+        action_text: document.getElementById('card_action_text').value.trim(),
+        action_link: document.getElementById('card_action_link').value.trim(),
+        sort_order: parseInt(document.getElementById('card_sort_order').value) || 0,
+        is_active: document.getElementById('card_is_active').checked ? 1 : 0
+      };
+
+      try {
+        const url = cardId ? `/admin/api/cards/${cardId}` : '/admin/api/cards';
+        const method = cardId ? 'PUT' : 'POST';
+
+        const res = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentToken}` },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+
+        closeCardModal();
+        fetchCards();
+      } catch (err) {
+        alert('Card Save Error: ' + err.message);
+      }
+    }
+
+    async function toggleCardVisibility(cardId) {
+      try {
+        const res = await fetch(`/admin/api/cards/${cardId}/toggle`, {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+        fetchCards();
+      } catch (err) {
+        alert('Toggle Error: ' + err.message);
+      }
+    }
+
+    async function deleteCard(cardId) {
+      if (!confirm('Are you sure you want to permanently delete this service card?')) return;
+      try {
+        const res = await fetch(`/admin/api/cards/${cardId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+        fetchCards();
+      } catch (err) {
+        alert('Delete Error: ' + err.message);
+      }
+    }
+
+    // ── TAB 3: SECTION VISIBILITY TOGGLES ───────────────────────────
+    async function loadSectionToggles() {
+      try {
+        const res = await fetch('/admin/api/settings', { headers: { 'Authorization': `Bearer ${currentToken}` } });
+        if (res.status === 401) return logout();
+        const data = await res.json();
+        if (data.ok && data.settings) {
+          const s = data.settings;
+          const sectionKeys = [
+            'section_hero', 'section_services', 'section_approach', 'section_industries',
+            'section_coverage', 'section_testimonials', 'section_quote', 'section_contact',
+            // Individual Operations Desk cards
+            'contact_card_phone', 'contact_card_address', 'contact_card_whatsapp',
+            'contact_card_quotes', 'contact_card_general'
+          ];
+          sectionKeys.forEach(key => {
+            const el = document.getElementById('toggle_' + key);
+            if (el) el.checked = s[key] !== '0';
+          });
+        }
+      } catch (err) {}
+    }
+
+    async function saveSectionToggles() {
+      const msg = document.getElementById('sectionSaveMsg');
+      msg.style.display = 'none';
+
+      const payload = {
+        section_hero:         document.getElementById('toggle_section_hero').checked ? '1' : '0',
+        section_services:     document.getElementById('toggle_section_services').checked ? '1' : '0',
+        section_approach:     document.getElementById('toggle_section_approach').checked ? '1' : '0',
+        section_industries:   document.getElementById('toggle_section_industries').checked ? '1' : '0',
+        section_coverage:     document.getElementById('toggle_section_coverage').checked ? '1' : '0',
+        section_testimonials: document.getElementById('toggle_section_testimonials').checked ? '1' : '0',
+        section_quote:        document.getElementById('toggle_section_quote').checked ? '1' : '0',
+        section_contact:      document.getElementById('toggle_section_contact').checked ? '1' : '0',
+        // Operations Desk individual card toggles
+        contact_card_phone:    document.getElementById('toggle_contact_card_phone').checked ? '1' : '0',
+        contact_card_address:  document.getElementById('toggle_contact_card_address').checked ? '1' : '0',
+        contact_card_whatsapp: document.getElementById('toggle_contact_card_whatsapp').checked ? '1' : '0',
+        contact_card_quotes:   document.getElementById('toggle_contact_card_quotes').checked ? '1' : '0',
+        contact_card_general:  document.getElementById('toggle_contact_card_general').checked ? '1' : '0'
+      };
+
+      try {
+        const res = await fetch('/admin/api/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentToken}` },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 3000);
+      } catch (err) {
+        alert('Failed saving visibility toggles: ' + err.message);
+      }
+    }
+
+    // ── TAB 4: CONTACT & ADDRESS SETTINGS ───────────────────────────
+    async function loadContactSettings() {
+      try {
+        const res = await fetch('/admin/api/settings', { headers: { 'Authorization': `Bearer ${currentToken}` } });
+        if (res.status === 401) return logout();
+        const data = await res.json();
+        if (data.ok && data.settings) {
+          const s = data.settings;
+          // Contact section heading
+          document.getElementById('set_contact_eyebrow').value  = s.contact_eyebrow  || 'DIRECT CONTACT & DISPATCH';
+          document.getElementById('set_contact_title').value    = s.contact_title    || 'Connect with our operations desk.';
+          document.getElementById('set_contact_subtitle').value = s.contact_subtitle || '';
+          // Phone & calling
+          document.getElementById('set_phone_number').value     = s.phone_number     || '';
+          document.getElementById('set_phone_display').value    = s.phone_display    || '';
+          document.getElementById('set_alternate_phone').value  = s.alternate_phone  || '';
+          document.getElementById('set_business_hours').value   = s.business_hours   || '';
+          // Address & maps
+          document.getElementById('set_office_address').value   = s.office_address   || '';
+          document.getElementById('set_google_maps_url').value  = s.google_maps_url  || '';
+          // WhatsApp
+          document.getElementById('set_whatsapp_number').value  = s.whatsapp_number  || '';
+          document.getElementById('set_whatsapp_message').value = s.whatsapp_message || '';
+          // Email & SLA
+          document.getElementById('set_contact_email').value    = s.contact_email    || '';
+          document.getElementById('set_quotations_email').value = s.quotations_email || '';
+          document.getElementById('set_response_time').value    = s.response_time    || '';
+        }
+      } catch (err) {}
+    }
+
+    async function saveContactSettings() {
+      const msg = document.getElementById('contactSaveMsg');
+      msg.style.display = 'none';
+
+      const payload = {
+        contact_eyebrow: document.getElementById('set_contact_eyebrow').value.trim(),
+        contact_title:   document.getElementById('set_contact_title').value.trim(),
+        contact_subtitle:document.getElementById('set_contact_subtitle').value.trim(),
+        phone_number:    document.getElementById('set_phone_number').value.trim(),
+        phone_display:   document.getElementById('set_phone_display').value.trim(),
+        alternate_phone: document.getElementById('set_alternate_phone').value.trim(),
+        business_hours:  document.getElementById('set_business_hours').value.trim(),
+        office_address:  document.getElementById('set_office_address').value.trim(),
+        google_maps_url: document.getElementById('set_google_maps_url').value.trim(),
+        whatsapp_number: document.getElementById('set_whatsapp_number').value.trim(),
+        whatsapp_message:document.getElementById('set_whatsapp_message').value.trim(),
+        contact_email:   document.getElementById('set_contact_email').value.trim(),
+        quotations_email:document.getElementById('set_quotations_email').value.trim(),
+        response_time:   document.getElementById('set_response_time').value.trim()
+      };
+
+      try {
+        const res = await fetch('/admin/api/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentToken}` },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+
+        msg.textContent = '✓ Contact settings updated! Changes are live on the public site.';
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 3000);
+      } catch (err) {
+        alert('Failed saving settings: ' + err.message);
+      }
+    }
+
+    // ── TAB 5: SECTION CONTENT EDITOR ───────────────────────────────
+    async function loadContentSettings() {
+      try {
+        const res = await fetch('/admin/api/settings', { headers: { 'Authorization': `Bearer ${currentToken}` } });
+        if (res.status === 401) return logout();
+        const data = await res.json();
+        if (!data.ok) return;
+        const s = data.settings;
+
+        // Hero
+        document.getElementById('set_hero_badge').value = s.hero_badge || '';
+        document.getElementById('set_hero_title').value = s.hero_title || '';
+        document.getElementById('set_hero_desc').value  = s.hero_desc  || '';
+
+        // Approach Steps — build inline editor
+        const stepEditor = document.getElementById('approachStepsEditor');
+        stepEditor.innerHTML = '';
+        for (let i = 1; i <= 4; i++) {
+          stepEditor.innerHTML += `
+            <div style="background: var(--navy); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; display: grid; grid-template-columns: 1fr 2fr; gap: 12px; align-items: flex-start;">
+              <div class="form-group" style="margin:0;">
+                <label style="font-size:10px;">STEP ${i} HEADING</label>
+                <input type="text" id="set_approach_step${i}_title" value="${(s['approach_step'+i+'_title'] || '').replace(/"/g,'&quot;')}" placeholder="Step ${i} Title">
+              </div>
+              <div class="form-group" style="margin:0;">
+                <label style="font-size:10px;">STEP ${i} DESCRIPTION</label>
+                <input type="text" id="set_approach_step${i}_desc" value="${(s['approach_step'+i+'_desc'] || '').replace(/"/g,'&quot;')}" placeholder="Step ${i} description...">
+              </div>
+            </div>`;
+        }
+
+        // Coverage
+        document.getElementById('set_coverage_title').value        = s.coverage_title        || '';
+        document.getElementById('set_coverage_desc').value         = s.coverage_desc         || '';
+        document.getElementById('set_coverage_network_text').value = s.coverage_network_text || '';
+
+        // Contact Section Copy
+        document.getElementById('set_content_contact_eyebrow').value  = s.contact_eyebrow  || 'DIRECT CONTACT & DISPATCH';
+        document.getElementById('set_content_contact_title').value    = s.contact_title    || 'Connect with our operations desk.';
+        document.getElementById('set_content_contact_subtitle').value = s.contact_subtitle || '';
+
+        // Industries JSON
+        try {
+          const indJson = JSON.parse(s.industries_json || '[]');
+          document.getElementById('set_industries_json').value = JSON.stringify(indJson, null, 2);
+        } catch { document.getElementById('set_industries_json').value = s.industries_json || ''; }
+
+        // Testimonials JSON
+        try {
+          const testiJson = JSON.parse(s.testimonials_json || '[]');
+          document.getElementById('set_testimonials_json').value = JSON.stringify(testiJson, null, 2);
+        } catch { document.getElementById('set_testimonials_json').value = s.testimonials_json || ''; }
+
+      } catch (err) {}
+    }
+
+    async function saveContentSettings() {
+      const msg = document.getElementById('contentSaveMsg');
+      msg.style.display = 'none';
+
+      const payload = {
+        hero_badge: document.getElementById('set_hero_badge').value.trim(),
+        hero_title: document.getElementById('set_hero_title').value.trim(),
+        hero_desc:  document.getElementById('set_hero_desc').value.trim(),
+        coverage_title:        document.getElementById('set_coverage_title').value.trim(),
+        coverage_desc:         document.getElementById('set_coverage_desc').value.trim(),
+        coverage_network_text: document.getElementById('set_coverage_network_text').value.trim(),
+        contact_eyebrow:       document.getElementById('set_content_contact_eyebrow').value.trim(),
+        contact_title:         document.getElementById('set_content_contact_title').value.trim(),
+        contact_subtitle:      document.getElementById('set_content_contact_subtitle').value.trim(),
+      };
+
+      for (let i = 1; i <= 4; i++) {
+        payload['approach_step'+i+'_title'] = document.getElementById('set_approach_step'+i+'_title')?.value.trim() || '';
+        payload['approach_step'+i+'_desc']  = document.getElementById('set_approach_step'+i+'_desc')?.value.trim() || '';
+      }
+
+      // Validate JSON fields
+      const indRaw = document.getElementById('set_industries_json').value.trim();
+      const testiRaw = document.getElementById('set_testimonials_json').value.trim();
+      try { JSON.parse(indRaw); payload.industries_json = indRaw; }
+      catch { alert('Industries JSON is invalid. Please fix and retry.'); return; }
+      try { JSON.parse(testiRaw); payload.testimonials_json = testiRaw; }
+      catch { alert('Testimonials JSON is invalid. Please fix and retry.'); return; }
+
+      try {
+        const res = await fetch('/admin/api/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentToken}` },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+        msg.textContent = '✓ Section content saved! Refresh the public site to see changes.';
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 3500);
+      } catch (err) {
+        alert('Failed saving content: ' + err.message);
+      }
+    }
+
+    // ── TAB 6: THEME & BRANDING ──────────────────────────────────────
+    // ── TAB 6: THEME, BRANDING & LOGO ──────────────────────────────
+    function updateAdminLogoPreview() {
+      const text = document.getElementById('set_logo_text').value.trim() || 'NM GLOBAL LOGISTICS';
+      const icon = document.getElementById('set_logo_icon').value.trim() || 'fa-diamond';
+      const imgUrl = document.getElementById('set_logo_image_url').value.trim();
+      const previewBox = document.getElementById('adminLogoPreview');
+
+      if (imgUrl) {
+        previewBox.innerHTML = `<img src="${imgUrl}" alt="${text}" style="max-height: 32px; width: auto; object-fit: contain;"> <span style="margin-left: 8px;">${text}</span>`;
+      } else {
+        previewBox.innerHTML = `<span style="color: var(--orange); font-size: 18px;"><i class="fa-solid ${icon}"></i></span> <span>${text}</span>`;
+      }
+    }
+
+    function selectLogoIcon(icon) {
+      document.getElementById('set_logo_icon').value = icon;
+      updateAdminLogoPreview();
+    }
+
+    async function loadThemeSettings() {
+      try {
+        const res = await fetch('/admin/api/settings', { headers: { 'Authorization': `Bearer ${currentToken}` } });
+        if (res.status === 401) return logout();
+        const data = await res.json();
+        if (!data.ok) return;
+        const s = data.settings;
+
+        // Logo
+        document.getElementById('set_logo_text').value      = s.logo_text || 'NM GLOBAL LOGISTICS';
+        document.getElementById('set_logo_icon').value      = s.logo_icon || 'fa-diamond';
+        document.getElementById('set_logo_image_url').value = s.logo_image_url || '';
+        updateAdminLogoPreview();
+
+        // Theme color
+        const color = s.theme_color || '#f26522';
+        document.getElementById('set_theme_color').value = color;
+        document.getElementById('set_theme_color_picker').value = color;
+
+        // Mark selected preset btn
+        document.querySelectorAll('.theme-preset-btn').forEach(btn => {
+          btn.classList.toggle('selected', btn.dataset.color === color);
+        });
+
+        // Mark selected mode
+        const preset = s.theme_preset || 'midnight_asphalt';
+        document.querySelectorAll('input[name="theme_preset"]').forEach(radio => {
+          radio.checked = radio.value === preset;
+        });
+      } catch (err) {}
+    }
+
+    function setAccentPreset(color, btn) {
+      document.getElementById('set_theme_color').value = color;
+      document.getElementById('set_theme_color_picker').value = color;
+      document.querySelectorAll('.theme-preset-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+
+    async function saveThemeSettings() {
+      const msg = document.getElementById('themeSaveMsg');
+      msg.style.display = 'none';
+
+      const color = document.getElementById('set_theme_color').value.trim();
+      const preset = document.querySelector('input[name="theme_preset"]:checked')?.value || 'midnight_asphalt';
+      const logoText = document.getElementById('set_logo_text').value.trim();
+      const logoIcon = document.getElementById('set_logo_icon').value.trim() || 'fa-diamond';
+      const logoImg  = document.getElementById('set_logo_image_url').value.trim();
+
+      if (!/^#[0-9a-fA-F]{6}$/.test(color)) {
+        alert('Please enter a valid hex color (e.g. #f26522)');
+        return;
+      }
+
+      try {
+        const res = await fetch('/admin/api/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentToken}` },
+          body: JSON.stringify({
+            theme_color: color,
+            theme_preset: preset,
+            logo_text: logoText,
+            logo_icon: logoIcon,
+            logo_image_url: logoImg
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+        msg.textContent = '✓ Brand & Theme saved! Refresh the public site to see the updated logo and styling.';
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 3500);
+      } catch (err) {
+        alert('Failed saving theme & logo: ' + err.message);
+      }
+    }
+  </script>
+</body>
+</html>

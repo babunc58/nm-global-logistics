@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+
+# Database
+data/*.db
+data/*.db-journal
+
+# Logs & temp
+*.log
+npm-debug.log*
+
+# Test scripts & temp screenshots
+*.png
+public/*.png
+public/lcode-data.json
+lcode-*.png
+test-*.js
+inspect-*.js
+full-test-suite.js
+take-screenshots.js
