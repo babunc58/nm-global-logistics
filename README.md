@@ -1,8 +1,11 @@
 # NM Global Logistics — Enterprise Platform (LCode-Inspired Architecture)
 
-> **Website:** [http://127.0.0.1:5000/](http://127.0.0.1:5000/)  
-> **Admin Control Hub:** [http://127.0.0.1:5000/admin](http://127.0.0.1:5000/admin)  
-> **Credentials:** `admin` / `NMLogistics@2024`  
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/babunc58/nm-global-logistics)
+
+> **GitHub Repository:** [https://github.com/babunc58/nm-global-logistics](https://github.com/babunc58/nm-global-logistics)  
+> **Local Server:** [http://localhost:5000/](http://localhost:5000/)  
+> **Admin Control Hub:** [http://localhost:5000/admin](http://localhost:5000/admin)  
+> **Default Admin Credentials:** `admin` / `NMLogistics@2024`  
 
 ---
 

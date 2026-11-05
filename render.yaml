@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: nm-global-logistics
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        value: NMLogistics@2024
+      - key: JWT_SECRET
+        generateValue: true
