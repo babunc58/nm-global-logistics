@@ -14,3 +14,4 @@ services:
         value: NMLogistics@2024
       - key: JWT_SECRET
         generateValue: true
+
